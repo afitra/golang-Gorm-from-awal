@@ -1,0 +1,140 @@
+ go mod init pertama ->> membuat module pertama 
+
+#fungsi
+fungsi dalam golang jika di awali huruf kapital = publik  kecil = private
+fungsi jika ada paramter dan return harus di init tipe datanya
+func Tes(param1 int) int {
+    return 0
+}
+
+func calculete(panjang int, lebar int)(int, int){
+    luas := panjang * lebar 
+    keliling := 2 * (panjang + lebar)
+    return uas, keliling 
+}
+luas, keliling := calculate(10,2)
+
+
+mebuat variable jika langsung di isi value 
+var age = 45
+atau
+age:= 45
+
+jika kosong harus di beri tipe datanya 
+var age Int
+
+#if
+penulisan if / conditional tidak memakai ()
+if umur> 10 {
+    	fmt.Println("umur di atas 10")
+}
+
+#loop
+penulisan loop juda tanpa ()
+for i=0; i<10; i++ {
+    	fmt.Println("ini iterasi ke - ", i)
+}
+title:="ibu pergi kepasar"
+for ndex, letter := range title{
+    	fmt.Println("ini index ke : ", index, " ini huruf : ",string(letter) )
+}
+
+#array
+penulisan array harus di tulis baerapa banyak value nya  dan tipe data value nya
+var languages [5] string
+ atau  (cara ini di value paling akhir harus di kasih koma )
+ languages:=[...] {
+     "ruby",
+     "python",
+     "node"
+     "go",
+     "php",
+ } 
+ languages[4] = "indonesia"
+
+#slice 
+mirip array  add data pakai append
+	var gaming []string
+	var gamingConsole []string
+	gamingConsole = append(gamingConsole, "ok")
+	gaming = append(gamingConsole, "ps4")
+	fmt.Println(gamingConsole) ->> [ok]
+	fmt.Println(gaminge) ->> [ok ps4]
+
+#map
+var myApp map[string] int ->> deklarasi variable nya
+myMap = map[string] init{} ->> mengisi variable dengan [ kosong]
+myMap["ruby"] = 9
+myMap["node"] = 8
+delete(myMap,"ruby") ->> untuk menghapus key and value
+
+fmt.Println(myMap["ruby"]) ->> 9
+
+	myMap := map[string]string{
+		"ruby": "i love ruby",
+		"node": "i love node",
+	}
+	value, tes := myMap["phyton"]
+	fmt.Println(value, "xxx") ==>> xxx  karena value bernilai kosong
+	fmt.Println(tes) ===> false karena tidak ada key phton shg tes jd default false
+
+#slice of map
+
+   students := []map[string]string{
+       {"name": " ruby", "score":"C"},
+		{"name": "node", "score": "B"},
+	} 
+
+
+#struct
+type  User struct {
+    ID int
+    FirstName string
+    LastName string
+    Email string
+    isActive bool
+}
+
+ === ini setter struct
+user:= User {}
+user.ID = 1
+user.FirstName = "budi"
+user.LastName = "raharjo"
+user.Email = "a@mail.com"
+user.isActive = false
+
+atau harus urut posisi nya
+user := User{1,"budi","raharjo","a@mail.com",false}
+
+atau 
+user := User{
+    ID :1,
+    FirstName :"budi",
+    LastName : "raharjo"
+    Email :"a@mail.com",
+    isActive: false
+}
+cara panggil
+fmt.Println(user.FirstName) -->> budi
+
+#pointer 
+& -->> proses reference
+* -->> dereference / pointer
+numberA := 5
+numberB := &numberA
+ atau
+ numberB *int = &numberA
+
+
+fmt.Println(numberB) -->> 0x0005 alamat memory numberA di simpan
+fmt.Println(*numberB) -->>  5 value dari lokasi 0x005 
+
+numberB := 200  -->> merubah value dari lokasi 0x005 karena numberB berisi alamat memory
+
+fmt.Println(*numberB) -->>  200
+fmt.Println(numberA) -->> 200
+ 
+
+ #interface
+
+ada kontrak berupa method
