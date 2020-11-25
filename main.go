@@ -1,20 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
 
-// pertama  = nama module
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
 
 func main() {
 
-	students := []map[string]string{
-		{"name": " ruby", "score": "C"},
-		{"name": "node", "score": "B"},
+	dsn := "root:root@tcp(127.0.0.1:3306)/starup?charset=utf8mb4&parseTime=True&loc=Local"
+	_, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Fatal(err.Error())
 	}
-	temp := map[string]string{
-		"name":  "php",
-		"score": "B",
-	}
-	// students.make(students[2], temp)
-	// students[2] = temp
-	fmt.Println(students, temp)
+	fmt.Println("koneksi DB berhasil *******")
 }

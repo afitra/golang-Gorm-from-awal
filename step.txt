@@ -1,0 +1,5 @@
+1. go mod init starup -->> init project
+2. instal gin -->>  go get -u github.com/gin-gonic/gin ==> untuk http framework
+3. install gorm -->> go get -u gorm.io/gorm ==>> install orm nya
+4. install driver mysql di gorm -->> go get -u gorm.io/driver/mysql 
+5. buat file utama main.go
