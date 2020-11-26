@@ -3,3 +3,8 @@
 3. install gorm -->> go get -u gorm.io/gorm ==>> install orm nya
 4. install driver mysql di gorm -->> go get -u gorm.io/driver/mysql 
 5. buat file utama main.go
+6. membuat db
+7. membuat repository
+8. membuat service -->> mapping dari struct input  ke struct user lalu di parsing ke repository 
+9. membuat handler ->> mapping input dari user -> struct
+10. membuat input -->> input dari user
