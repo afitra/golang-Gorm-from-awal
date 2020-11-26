@@ -3,7 +3,7 @@ package user
 import "gorm.io/gorm"
 
 type Repository interface {
-	Save(user User) (User error)
+	Save(user User) (User, error)
 }
 
 type repository struct {
