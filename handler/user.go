@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"starup/helper"
 	"starup/user"
@@ -55,6 +56,8 @@ func (h *userHandler) Login(c *gin.Context) {
 	var input user.LoginInput
 
 	err := c.ShouldBindJSON(&input)
+
+	fmt.Println("ini loginnnnn,  ", err)
 	if err != nil {
 
 		errors := helper.FormatValidationError(err)
@@ -80,6 +83,13 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	response := helper.ApiResponse("Login successfull", http.StatusOK, "success", formatter)
 
+	c.JSON(http.StatusOK, response)
+
+}
+func (h *userHandler) FetchUser(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(user.User)
+	formatter := user.FormatUser(currentUser, "")
+	response := helper.ApiResponse("successfully fetch user data", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
 
 }
