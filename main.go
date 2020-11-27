@@ -26,33 +26,16 @@ func main() {
 
 	userService := user.NewService(userRepository)
 
-	// input := user.LoginInput{
-	// 	Email:    "a@mail.com",
-	// 	Password: "123456",
-	// }
-	// user, err := userService.Login(input)
-	// if err != nil {
-	// 	fmt.Println("terjadi kesalahan")
-	// 	fmt.Println(err.Error())
-	// }
+	// userService.SaveAvatar(1, "yesss")
 
-	// fmt.Println(user)
 	userHandler := handler.NewUserHandler(userService)
-	// fmt.Println(">>>>>>", *userRepository)
-	// userInput := user.RegisterUserInput{}
 
-	// userInput.Name = "budi"
-	// userInput.Email = "budi@mail.com"
-	// userInput.Occupation = "anak sekolahan"
-	// userInput.Password = "123456"
-	// userService.RegisterUser(userInput)
-
-	// userHandler := handler.NewUserHandler(userService)
 	router := gin.Default()
 	api := router.Group("/api/v1")
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/cek-email", userHandler.CheckEmailAvailability)
+	api.POST("/avatars", userHandler.UpoadAvatar)
 	router.Run()
 }

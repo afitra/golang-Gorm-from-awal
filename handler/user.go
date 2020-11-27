@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"starup/helper"
 	"starup/user"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -127,10 +129,53 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *userHandler) FetchUserr(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(user.User)
-	formatter := user.FormatUser(currentUser, "")
-	response := helper.ApiResponse("successfully fetch user data", http.StatusOK, "success", formatter)
+func (h *userHandler) UpoadAvatar(c *gin.Context) {
+	// 1. inputdari user
+	// 2. simpan gambar di folder "images/"
+	// 3. di servis memanggil repo
+	// 4. JWT jika belum ada default pakai user ID = 1
+	// 5. repo ambil data user dengan ID 1
+	// 6. repo mengupdate data user dan menyimpan lokasi file (path)
+
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
+		c.JSON(http.StatusOK, response)
+	}
+	//  next pakat jwt bukan 1
+	userID := 1
+	currentTime := time.Now()
+
+	// path := "images/" + + currentTime.Format("2006#01#02") + "#" + file.Filename
+
+	path := fmt.Sprintf("images/%d-%s-%s", userID, currentTime.Format("2006#01#02"), file.Filename)
+	_, err = h.userService.SaveAvatar(userID, path)
+	err = c.SaveUploadedFile(file, path)
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
+		c.JSON(http.StatusOK, response)
+	}
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
+		c.JSON(http.StatusOK, response)
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helper.ApiResponse("Avatar successfully uploaded", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 
 }
+
+// func (h *userHandler) FetchUserr(c *gin.Context) {
+// 	currentUser := c.MustGet("currentUser").(user.User)
+// 	formatter := user.FormatUser(currentUser, "")
+// 	response := helper.ApiResponse("successfully fetch user data", http.StatusOK, "success", formatter)
+// 	c.JSON(http.StatusOK, response)
+
+// }
