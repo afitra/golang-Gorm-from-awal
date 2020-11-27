@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"starup/helper"
 	"starup/user"
@@ -57,7 +56,6 @@ func (h *userHandler) Login(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&input)
 
-	fmt.Println("ini loginnnnn,  ", err)
 	if err != nil {
 
 		errors := helper.FormatValidationError(err)
@@ -86,7 +84,50 @@ func (h *userHandler) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 
 }
-func (h *userHandler) FetchUser(c *gin.Context) {
+
+func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
+	// 1. ada input email dari user
+	// 2. input imael di parsing ke struct input
+	// 3. struct input di parsing ke struct service
+	// 4. service akan memanggil repository dan cek email sudah ada atau belum
+	// 5. repository akan membuat query ke DB
+
+	var input user.CheckEmailInput
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Login Account failed", http.StatusUnprocessableEntity, "error", errorMessage)
+
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	isEmail, err := h.userService.IsEmailAvailable(input)
+
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.ApiResponse("Login Account failed", http.StatusUnprocessableEntity, "error", errorMessage)
+
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	formatter := user.CheckEmail(isEmail)
+	var message string
+
+	if isEmail {
+		message = "Email Checked"
+	} else {
+		message = "Email already use in another account"
+	}
+	response := helper.ApiResponse(message, http.StatusOK, "success", formatter)
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) FetchUserr(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(user.User)
 	formatter := user.FormatUser(currentUser, "")
 	response := helper.ApiResponse("successfully fetch user data", http.StatusOK, "success", formatter)

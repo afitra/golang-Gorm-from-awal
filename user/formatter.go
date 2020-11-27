@@ -8,6 +8,9 @@ type UserFormatter struct {
 	Token      string `json:"token"`
 	ImageUrl   string `json:"image_url"`
 }
+type EmailCheckFormatter struct {
+	Validate bool `json:"validate"`
+}
 
 func FormatUser(user User, token string) UserFormatter {
 
@@ -19,5 +22,14 @@ func FormatUser(user User, token string) UserFormatter {
 		Token:      token,
 		ImageUrl:   user.AvatarFileName,
 	}
+	return formatter
+}
+
+func CheckEmail(validate bool) EmailCheckFormatter {
+
+	formatter := EmailCheckFormatter{
+		Validate: validate,
+	}
+
 	return formatter
 }
