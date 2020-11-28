@@ -26,8 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	// Campaign := campaign.CampaignImage{}
-	// db.AutoMigrate(Campaign)
+	Campaign := campaign.Campaign{}
+	db.AutoMigrate(Campaign)
 	fmt.Println("koneksi DB berhasil *******")
 
 	userRepository := user.NewRepository(db)
@@ -41,6 +41,8 @@ func main() {
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	router := gin.Default()
+	router.Static("/avatar", "./avatar") // kiri routenya , kanan directory folder
+
 	api := router.Group("/api/v1")
 
 	api.POST("/users", userHandler.RegisterUser)

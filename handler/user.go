@@ -168,7 +168,7 @@ func (h *userHandler) UpoadAvatar(c *gin.Context) {
 
 	// path := "images/" + + currentTime.Format("2006#01#02") + "#" + file.Filename
 
-	path := fmt.Sprintf("images/%d-%s-%s", userID, currentTime.Format("2006#01#02"), file.Filename)
+	path := fmt.Sprintf("avatar/%d-%s-%s", userID, currentTime.Format("2006-01-02-3:4:5"), file.Filename)
 	_, err = h.userService.SaveAvatar(userID, path)
 	err = c.SaveUploadedFile(file, path)
 
