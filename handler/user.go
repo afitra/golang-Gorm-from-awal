@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"starup/auth"
 	"starup/helper"
 	"starup/user"
 	"time"
@@ -12,10 +13,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 func (h *userHandler) RegisterUser(c *gin.Context) {
 
@@ -32,6 +34,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 	newUser, err := h.userService.RegisterUser(input)
+
 	if err != nil {
 		response := helper.ApiResponse("Register Account failed", http.StatusBadRequest, "error", nil)
 
@@ -39,7 +42,14 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.FormatUser(newUser, "token")
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.ApiResponse("Register Account failed", http.StatusBadRequest, "error", nil)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	formatter := user.FormatUser(newUser, token)
 
 	response := helper.ApiResponse("Account has been registered", http.StatusOK, "success", formatter)
 
@@ -78,8 +88,15 @@ func (h *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
+	token, err := h.authService.GenerateToken(loggedInUser.ID)
+	if err != nil {
+		response := helper.ApiResponse("Login  failed", http.StatusBadRequest, "error", nil)
 
-	formatter := user.FormatUser(loggedInUser, "token")
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := user.FormatUser(loggedInUser, token)
 
 	response := helper.ApiResponse("Login successfull", http.StatusOK, "success", formatter)
 

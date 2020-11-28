@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"starup/auth"
 	"starup/handler"
 	"starup/user"
 
@@ -26,9 +27,23 @@ func main() {
 
 	userService := user.NewService(userRepository)
 
-	// userService.SaveAvatar(1, "yesss")
+	authService := auth.NewService()
 
-	userHandler := handler.NewUserHandler(userService)
+	// fmt.Println(authService.GenerateToken(1001))
+
+	// userService.SaveAvatar(1, "yesss")
+	token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozN30.ZXz4SjPT__ENjFyz6TnNmFXWhxN5AYptgSwTyG0w1XY")
+
+	if err != nil {
+		fmt.Println("rusakkkkkkk")
+	}
+	if token.Valid {
+		fmt.Println("Benarrrrrr")
+	} else {
+
+		fmt.Println("rusakkk lagiiii")
+	}
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
