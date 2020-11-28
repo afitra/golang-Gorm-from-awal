@@ -31,18 +31,15 @@ func main() {
 	fmt.Println("koneksi DB berhasil *******")
 
 	userRepository := user.NewRepository(db)
-	campaignRepository := campaign.NewRepository(db)
-	campaigns, err := campaignRepository.FindAll()
-	// fmt.Println(campaigns[0], len(campaigns))
-
-	fmt.Println(len(campaigns[0].CampaignImages))
-
 	userService := user.NewService(userRepository)
+
+	campaignRepository := campaign.NewRepository(db)
+	campaignService := campaign.NewService(campaignRepository)
 
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
-
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 	router := gin.Default()
 	api := router.Group("/api/v1")
 
@@ -50,6 +47,9 @@ func main() {
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/cek-email", userHandler.CheckEmailAvailability)
 	api.POST("/avatars", authMiddlewere(authService, userService), userHandler.UpoadAvatar)
+
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
+
 	router.Run()
 }
 
