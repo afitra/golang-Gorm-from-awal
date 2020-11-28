@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"starup/auth"
+	"starup/campaign"
 	"starup/handler"
 	"starup/helper"
 	"starup/user"
@@ -25,9 +26,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	// Campaign := campaign.CampaignImage{}
+	// db.AutoMigrate(Campaign)
 	fmt.Println("koneksi DB berhasil *******")
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+	campaigns, err := campaignRepository.FindAll()
+	// fmt.Println(campaigns[0], len(campaigns))
+
+	fmt.Println(len(campaigns[0].CampaignImages))
 
 	userService := user.NewService(userRepository)
 
