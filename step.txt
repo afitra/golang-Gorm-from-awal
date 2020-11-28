@@ -8,3 +8,4 @@
 8. membuat service -->> mapping dari struct input  ke struct user lalu di parsing ke repository 
 9. membuat handler ->> mapping input dari user -> struct
 10. membuat input -->> input dari user
+11. jwt ->> go get github.com/dgrijalva/jwt-go  

@@ -26,8 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	Campaign := campaign.Campaign{}
-	db.AutoMigrate(Campaign)
+	// Campaign := campaign.Campaign{}
+	// db.AutoMigrate(Campaign)
 	fmt.Println("koneksi DB berhasil *******")
 
 	userRepository := user.NewRepository(db)
@@ -51,6 +51,7 @@ func main() {
 	api.POST("/avatars", authMiddlewere(authService, userService), userHandler.UpoadAvatar)
 
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 
 	router.Run()
 }
@@ -98,7 +99,7 @@ func authMiddlewere(authService auth.Service, userService user.Service) gin.Hand
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
-		fmt.Println(">>>>>", claim)
+
 		userID := int(claim["user_id"].(float64))
 
 		user, err := userService.GetUserByID(userID)

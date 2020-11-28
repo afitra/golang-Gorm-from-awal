@@ -1,8 +1,14 @@
 package campaign
 
-import "time"
+import (
+	"starup/user"
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Campaign struct {
+	gorm.Model
 	ID               int
 	UserID           int
 	Name             string
@@ -14,6 +20,7 @@ type Campaign struct {
 	CurrentAmount    int
 	Slug             string
 	CampaignImages   []CampaignImage
+	User             user.User `gorm:"foreignKey:id"`
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }

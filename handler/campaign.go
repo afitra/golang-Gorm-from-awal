@@ -27,6 +27,7 @@ func NewCampaignHandler(service campaign.Service) *campaignHandler {
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 
 	userID, _ := strconv.Atoi(c.Query("user_id"))
+
 	campaigns, err := h.service.GetCampaigns(userID)
 
 	if err != nil {
@@ -41,4 +42,35 @@ func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (h *campaignHandler) GetCampaign(c *gin.Context) {
+
+	// uri -->> api/v1/campaigns/2
+	// 1. handler 		: maping id yang di url ke struct input trus di masukkan ke  => service dan  call formatter
+	// 2. service 		: inputnya struct input => menangkap id di url , manggil repo
+	// 3. repository 	: get campaign by id
+
+	var input campaign.GetCampaignDetailInput
+	err := c.ShouldBindUri(&input)
+
+	if err != nil {
+		response := helper.ApiResponse("Error to get detail Campaigns", http.StatusBadRequest, "error", nil)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	campaignDetail, err := h.service.GetCampaignByID(input)
+
+	if err != nil {
+		response := helper.ApiResponse("Error to get detail Campaigns", http.StatusBadRequest, "error", nil)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+
+	}
+
+	response := helper.ApiResponse("Campaign detail", http.StatusOK, "success", campaign.FormatCampaignDetail(campaignDetail))
+	c.JSON(http.StatusOK, response)
 }
