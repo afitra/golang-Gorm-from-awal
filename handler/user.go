@@ -161,8 +161,9 @@ func (h *userHandler) UpoadAvatar(c *gin.Context) {
 		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
 		c.JSON(http.StatusOK, response)
 	}
-	//  next pakat jwt bukan 1
-	userID := 1
+	//  next pakat jwt bukan
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
 	currentTime := time.Now()
 
 	// path := "images/" + + currentTime.Format("2006#01#02") + "#" + file.Filename
