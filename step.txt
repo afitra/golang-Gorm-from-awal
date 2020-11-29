@@ -9,3 +9,4 @@
 9. membuat handler ->> mapping input dari user -> struct
 10. membuat input -->> input dari user
 11. jwt ->> go get github.com/dgrijalva/jwt-go  
+12. slug -->> go get github.com/gosimple/slug
