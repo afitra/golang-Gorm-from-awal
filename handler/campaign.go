@@ -84,7 +84,7 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 
 	var input campaign.CreateCampaignInput
-	err := c.ShouldBind(&input)
+	err := c.ShouldBindJSON(&input)
 
 	if err != nil {
 
@@ -112,4 +112,55 @@ func (h *campaignHandler) CreateCampaign(c *gin.Context) {
 	response := helper.ApiResponse("Succes to create  Campaign", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
+
+	// 1. user masukkan input
+	// 2. handler
+	// 3. mapping dari input ke struct input (ada 2)
+	// 4. input dari user dan juga input dari uri (passing ke service )
+	// 5. service
+	// 6. repository update data campaign
+
+	var inputID campaign.GetCampaignDetailInput
+	err := c.ShouldBindUri(&inputID)
+
+	if err != nil {
+		response := helper.ApiResponse("Failed to update Campaign", http.StatusBadRequest, "error", nil)
+
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	var inputData campaign.CreateCampaignInput
+	err = c.ShouldBindJSON(&inputData)
+
+	if err != nil {
+
+		errors := helper.FormatValidationError(err)
+
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Failed to update Campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User) //  data user (dari relasi db) di set agar bisa di baca di service dan dilakukan verifikasi
+
+	inputData.User = currentUser // apakah benar yg sedang login adlah user yang punya campaign
+
+	updatedCampaign, err := h.service.UpdateCampaign(inputID, inputData)
+
+	if err != nil {
+
+		response := helper.ApiResponse("Failed to update Campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.ApiResponse("Succes to update  Campaign", http.StatusOK, "success", campaign.FormatCampaign(updatedCampaign))
+	c.JSON(http.StatusOK, response)
 }
