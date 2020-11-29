@@ -158,8 +158,9 @@ func (h *userHandler) UpoadAvatar(c *gin.Context) {
 
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
-		c.JSON(http.StatusOK, response)
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 	//  next pakat jwt bukan
 	currentUser := c.MustGet("currentUser").(user.User)
@@ -174,14 +175,17 @@ func (h *userHandler) UpoadAvatar(c *gin.Context) {
 
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
-		c.JSON(http.StatusOK, response)
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
+	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		response := helper.ApiResponse("failed to upload avatar image", http.StatusOK, "success", data)
-		c.JSON(http.StatusOK, response)
+		response := helper.ApiResponse("failed to upload avatar image", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	data := gin.H{"is_uploaded": true}

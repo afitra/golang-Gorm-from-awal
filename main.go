@@ -54,6 +54,7 @@ func main() {
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 	api.POST("/campaigns", authMiddlewere(authService, userService), campaignHandler.CreateCampaign)
 	api.PUT("/campaigns/:id", authMiddlewere(authService, userService), campaignHandler.UpdateCampaign)
+	api.POST("/campaign-images", authMiddlewere(authService, userService), campaignHandler.UploadImage)
 
 	router.Run()
 }
