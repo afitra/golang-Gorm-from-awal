@@ -3,11 +3,11 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"starup/campaign"
 	"starup/helper"
 	"starup/user"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -180,8 +180,7 @@ func (h *campaignHandler) UploadImage(c *gin.Context) {
 	var input campaign.CreateCampaignImageInput
 
 	err := c.ShouldBind(&input)
-	fmt.Println("========", input.IsPrimary, "xxxxx", reflect.TypeOf(input.IsPrimary), err)
-	fmt.Println("<<<<<<", err)
+
 	if err != nil {
 		errors := helper.FormatValidationError(err)
 
@@ -192,8 +191,12 @@ func (h *campaignHandler) UploadImage(c *gin.Context) {
 		return
 
 	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+	userID := currentUser.ID
 	file, err := c.FormFile("file")
-	fmt.Println(">>>>>>>", file)
+
 	if err != nil {
 
 		data := gin.H{"is_uploaded": false}
@@ -204,10 +207,8 @@ func (h *campaignHandler) UploadImage(c *gin.Context) {
 		return
 
 	}
-	currentUser := c.MustGet("currentUser").(user.User)
-	userID := currentUser.ID
-
-	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+	currentTime := time.Now()
+	path := fmt.Sprintf("images/%d-%s-%s-%s", userID, "campaign", currentTime.Format("2006-01-02-3:4:5"), file.Filename)
 
 	err = c.SaveUploadedFile(file, path)
 
