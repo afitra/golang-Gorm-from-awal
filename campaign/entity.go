@@ -20,7 +20,7 @@ type Campaign struct {
 	CurrentAmount    int
 	Slug             string
 	CampaignImages   []CampaignImage
-	User             user.User `gorm:"foreignKey:id"`
+	User             user.User
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }

@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"starup/campaign"
 	"starup/user"
 	"time"
 
@@ -15,7 +16,8 @@ type Transaction struct {
 	Amount     int
 	Status     string
 	Code       string
-	User       user.User `gorm:"foreignKey:id"`
+	User       user.User `gorm:"foreignKey:UserId"` /// UserId ambil dari line atas nya
+	Campaign   campaign.Campaign
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

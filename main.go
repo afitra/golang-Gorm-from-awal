@@ -61,9 +61,44 @@ func main() {
 	api.PUT("/campaigns/:id", authMiddlewere(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddlewere(authService, userService), campaignHandler.UploadImage)
 
-	api.GET("/campaigns/:id/transactions", authMiddlewere(authService, userService), transactionHandler.GetCampaignTransaction)
+	api.GET("/campaigns/:id/transactions",
+		authMiddlewere(authService, userService),
+		authorizeCampaign(campaignRepository),
+		transactionHandler.GetCampaignTransaction)
+
+	api.GET("/transactions",
+		authMiddlewere(authService, userService),
+		transactionHandler.GetUserTransactions)
 
 	router.Run()
+}
+
+func authorizeCampaign(campaignRepository campaign.Repository) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var input transaction.GetCampaignTransactionsInput
+		currentUser := c.MustGet("currentUser").(user.User)
+		input.User = currentUser
+		err := c.ShouldBindUri(&input)
+		campaign, err := campaignRepository.FindByID(input.ID)
+
+		if err != nil {
+
+			response := helper.ApiResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+		if campaign.UserID != input.User.ID {
+
+			response := helper.ApiResponse("Unauthorized, User not owner campaign", http.StatusUnauthorized, "error", nil)
+
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+
+		}
+
+	}
+
 }
 
 func authMiddlewere(authService auth.Service, userService user.Service) gin.HandlerFunc {

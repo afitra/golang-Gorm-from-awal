@@ -1,7 +1,6 @@
 package transaction
 
 import (
-	"errors"
 	"starup/campaign"
 )
 
@@ -12,6 +11,7 @@ type service struct {
 
 type Service interface {
 	GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
+	GetTransactionsByUserID(userID int) ([]Transaction, error)
 }
 
 func NewService(repository Repository, campaignRepository campaign.Repository) *service {
@@ -21,19 +21,6 @@ func NewService(repository Repository, campaignRepository campaign.Repository) *
 
 func (s *service) GetTransactionsByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error) {
 
-	// get campaign
-	// check campaign.userid != user yg login/ request
-
-	campaign, err := s.campaignRepository.FindByID(input.ID)
-	if err != nil {
-		return []Transaction{}, err
-	}
-
-	if campaign.UserID != input.User.ID {
-
-		return []Transaction{}, errors.New("not an owner campaign")
-	}
-
 	transactions, err := s.repository.GetByCampaignID(input.ID)
 	if err != nil {
 		return transactions, err
@@ -41,4 +28,15 @@ func (s *service) GetTransactionsByCampaignID(input GetCampaignTransactionsInput
 
 	return transactions, nil
 
+}
+
+func (s *service) GetTransactionsByUserID(userID int) ([]Transaction, error) {
+	transactions, err := s.repository.GetByUserID(userID)
+
+	if err != nil {
+
+		return transactions, err
+	}
+
+	return transactions, nil
 }
