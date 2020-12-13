@@ -8,6 +8,7 @@ import (
 	"starup/campaign"
 	"starup/handler"
 	"starup/helper"
+	"starup/transaction"
 	"starup/user"
 	"strings"
 
@@ -26,8 +27,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	// Campaign := campaign.Campaign{}
-	// db.AutoMigrate(Campaign)
+
+	// db.Migrator().Cre ateTable(transaction.Transaction{})
 	fmt.Println("koneksi DB berhasil *******")
 
 	userRepository := user.NewRepository(db)
@@ -36,10 +37,14 @@ func main() {
 	campaignRepository := campaign.NewRepository(db)
 	campaignService := campaign.NewService(campaignRepository)
 
+	transactionRepository := transaction.NewRepository(db)
+	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 	router := gin.Default()
 	router.Static("/avatar", "./avatar") // kiri routenya , kanan directory folder
 
@@ -55,6 +60,8 @@ func main() {
 	api.POST("/campaigns", authMiddlewere(authService, userService), campaignHandler.CreateCampaign)
 	api.PUT("/campaigns/:id", authMiddlewere(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddlewere(authService, userService), campaignHandler.UploadImage)
+
+	api.GET("/campaigns/:id/transactions", authMiddlewere(authService, userService), transactionHandler.GetCampaignTransaction)
 
 	router.Run()
 }
