@@ -10,13 +10,14 @@ import (
 
 type Transaction struct {
 	gorm.Model
-	ID         int
+	ID         int `gorm:"primaryKey"`
 	CampaignID int
-	UserId     int
+	UserID     int
 	Amount     int
 	Status     string
 	Code       string
-	User       user.User `gorm:"foreignKey:UserId"` /// UserId ambil dari line atas nya
+	PaymentURL string
+	User       user.User /// UserId ambil dari line atas nya
 	Campaign   campaign.Campaign
 	CreatedAt  time.Time
 	UpdatedAt  time.Time

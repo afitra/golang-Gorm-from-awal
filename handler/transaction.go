@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"starup/helper"
 	"starup/transaction"
@@ -68,4 +69,45 @@ func (h *transactionHandler) GetUserTransactions(c *gin.Context) {
 
 	c.JSON(http.StatusBadRequest, response)
 
+}
+
+func (h *transactionHandler) CreateTransaction(c *gin.Context) {
+
+	// 1. ada input dari user
+	// 2. handler angkap input trus di maping ke input struct
+	// 3. panggil service untuk transaksi , manggil sistem midtrans
+	// 4. panggil repository create new transaction data
+
+	var input transaction.CreateTransactionInput
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+
+		errors := helper.FormatValidationError(err)
+
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Failed to create transaction", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newTransaction, err := h.service.CreateTransaction(input)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		response := helper.ApiResponse("Failed to create transaction", http.StatusUnprocessableEntity, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	// response := helper.ApiResponse("User's transactions", http.StatusOK, "success", newTransaction)
+	response := helper.ApiResponse("User's transactions", http.StatusOK, "success", transaction.FormatTransaction(newTransaction))
+
+	c.JSON(http.StatusBadRequest, response)
 }

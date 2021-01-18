@@ -8,6 +8,7 @@ import (
 	"starup/campaign"
 	"starup/handler"
 	"starup/helper"
+	"starup/payment"
 	"starup/transaction"
 	"starup/user"
 	"strings"
@@ -28,8 +29,19 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	// db.Migrator().Cre ateTable(transaction.Transaction{})
-	fmt.Println("koneksi DB berhasil *******")
+	// db.Migrator().CreateTable(user.User{})
+	// db.Migrator().CreateTable(campaign.Campaign{})
+	// db.Migrator().CreateTable(campaign.CampaignImage{})
+
+	// db.Migrator().CreateTable(transaction.Transaction{})
+	db.Debug().AutoMigrate(
+		&user.User{},
+		&campaign.Campaign{},
+		&campaign.CampaignImage{},
+		&transaction.Transaction{},
+	)
+
+	fmt.Println("\n koneksi DB berhasil *******\n")
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
@@ -37,10 +49,11 @@ func main() {
 	campaignRepository := campaign.NewRepository(db)
 	campaignService := campaign.NewService(campaignRepository)
 
-	transactionRepository := transaction.NewRepository(db)
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
-
 	authService := auth.NewService()
+	paymentService := payment.NewService()
+
+	transactionRepository := transaction.NewRepository(db)
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
@@ -49,6 +62,21 @@ func main() {
 	router.Static("/avatar", "./avatar") // kiri routenya , kanan directory folder
 
 	api := router.Group("/api/v1")
+
+	// ====== debug transaction
+
+	// user, _ := userService.GetUserByID(38)
+	// input := transaction.CreateTransactionInput{
+	// 	CampaignID: 11,
+	// 	Amount:     500000000,
+	// 	User:       user,
+	// }
+
+	// transactionService.CreateTransaction(input)
+
+	// value := os.Getenv("MIDTRANS_SERVER_KEY")
+	// os package
+	// value := helper.GoDotEnvVariable("MIDTRANS_SERVER_KEY")
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
@@ -70,7 +98,11 @@ func main() {
 		authMiddlewere(authService, userService),
 		transactionHandler.GetUserTransactions)
 
-	router.Run()
+	api.POST("/transactions",
+		authMiddlewere(authService, userService),
+		transactionHandler.CreateTransaction)
+	PORT := helper.GoDotEnvVariable("PORT")
+	router.Run(fmt.Sprintf(":%s", PORT))
 }
 
 func authorizeCampaign(campaignRepository campaign.Repository) gin.HandlerFunc {
