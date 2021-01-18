@@ -43,16 +43,14 @@ func main() {
 
 	fmt.Println("\n koneksi DB berhasil *******\n")
 
-	userRepository := user.NewRepository(db)
-	userService := user.NewService(userRepository)
-
 	campaignRepository := campaign.NewRepository(db)
-	campaignService := campaign.NewService(campaignRepository)
+	userRepository := user.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	authService := auth.NewService()
-	paymentService := payment.NewService()
-
-	transactionRepository := transaction.NewRepository(db)
+	userService := user.NewService(userRepository)
+	campaignService := campaign.NewService(campaignRepository)
+	paymentService := payment.NewService(transactionRepository, campaignRepository)
 	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
