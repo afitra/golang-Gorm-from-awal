@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -50,13 +51,14 @@ func main() {
 	authService := auth.NewService()
 	userService := user.NewService(userRepository)
 	campaignService := campaign.NewService(campaignRepository)
-	paymentService := payment.NewService(transactionRepository, campaignRepository)
+	paymentService := payment.NewService()
 	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 	router := gin.Default()
+	router.Use(cors.Default())
 	router.Static("/avatar", "./avatar") // kiri routenya , kanan directory folder
 
 	api := router.Group("/api/v1")
@@ -99,6 +101,9 @@ func main() {
 	api.POST("/transactions",
 		authMiddlewere(authService, userService),
 		transactionHandler.CreateTransaction)
+
+	api.POST("transaction/notification", transactionHandler.GetNotification)
+
 	PORT := helper.GoDotEnvVariable("PORT")
 	router.Run(fmt.Sprintf(":%s", PORT))
 }
